@@ -8,7 +8,8 @@ require 'msgpack'
 module Storage
 
   def self.get_path(key)
-    filename = [key].pack('m').tr('+/', '-_')
+    filename = [key].pack('m').tr('+/', '-_').gsub("\n", '')
+    p filename
     File.dirname(__FILE__) + '/data/' + filename
   end
 

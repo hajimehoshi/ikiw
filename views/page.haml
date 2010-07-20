@@ -1,4 +1,35 @@
-%section
-  %h2&= page.title
-  %section
-    != page.content
+!!! XML
+!!! 5
+%html{:xmlns => 'http://www.w3.org/1999/xhtml', 'xml:lang' => 'ja', :lang => 'ja'}
+  %head
+    %link{:rel => 'stylesheet', :href => '/stylesheets/style.css?c', :type => 'text/css'}
+    %title&= page.title
+  %body
+    %h1 *1
+    %nav
+      %ul
+        %li
+          %a{:id => 'viewTab', :href => '#'}> View
+        %li
+          %a{:id => 'editTab', :href => '#'}> Edit
+    #view
+      %section
+        %h2&= page.title
+        %section
+          != page.content
+    #edit
+      %section
+        %form{:action => '.', :method => 'put'}
+          %dl
+            %dt Title
+            %dd
+              %input{:id => 'inputTitle', :name => 'title', :type => 'text', :value => page.title}
+            %dt Content
+            %dd
+              %textarea{:id => 'inputContent', :name => 'content'}&= page.content
+          %p
+            %input{:type => 'submit'}
+    %address
+      Hajime Hoshi
+    %script{:src => 'javascripts/jquery-1.4.2.min.js', :type => 'text/javascript', :charset => 'utf-8'}
+    %script{:src => 'javascripts/ikiw.js', :type => 'text/javascript', :charset => 'utf-8'}
