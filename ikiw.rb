@@ -41,15 +41,11 @@ class Page
     @content = content
   end
 
-  def to_h
+  def to_msgpack
     {
       :title   => title,
       :content => content,
-    }
-  end
-
-  def to_msgpack
-    to_h.to_msgpack
+    }.to_msgpack
   end
 
 end
@@ -70,48 +66,34 @@ end
 get /^([^.]+)(\.([^.\/]+?))?$/ do
   path = params[:captures][0]
   ext = params[:captures][2] || 'html'
-  mime_type = case ext
-              when 'html'
-                'application/xhtml+xml'
-              when 'json'
-                'application/json'
-              end
+  mime_type = {
+    'html' => 'application/xhtml+xml',
+    'json' => 'application/json',
+  }[ext]
   return 404 unless mime_type
-  if (path[-1].chr == '/' and params[:captures][2])
-    return 404
-  end
-  if path == '/'
-    key = path
-  else
-    key = path.sub(/\/$/, '')
-  end
+  return 404 if (path[-1].chr == '/' and params[:captures][2])
+  key = path.sub(/\/$/, '/index')
   data = storage[key] || {}
   page = Page.new(data["title"] || '', data["content"] || '')
 
   content_type mime_type, :charset => 'utf-8'
-  haml :page, :locals => {:page => page}
+  case ext
+  when 'html'
+    haml :page, :locals => {:page => page}
+  when 'json'
+    '{}' # TODO: JSONize
+  end
 end
 
 put /^([^.]+)(\.([^.\/]+?))?$/ do
   path = params[:captures][0]
-  if params[:captures][2]
-    if path[-1].chr == '/'
-      return 404
-    else
-      return 405
-    end
-  end
-  if path == '/'
-    key = path
-  else
-    key = path.sub(/\/$/, '')
-  end
+  return path[-1].chr == '/' ? 404 : 405 if params[:captures][2]
+  key = path.sub(/\/$/, '/index')
+  return 422 if !params[:title] ^ !params[:content]
   if params[:title] and params[:content]
     storage[key] = Page.new(params[:title], params[:content])
-  elsif !params[:title] and !params[:content]
-    storage[key] = nil
   else
-    return 422
+    storage[key] = nil
   end
   headers 'Location' => request.url
   201

@@ -44,7 +44,14 @@ describe 'ikiw' do
     get '/'
     last_response.should be_ok
     last_response.content_type.should =~ %r{^application/xhtml\+xml}
-    Storage.last_key.should == '/'
+    Storage.last_key.should == '/index'
+    Storage.last_value.should be_nil
+
+    Storage.reset
+    get '/index.html'
+    last_response.should be_ok
+    last_response.content_type.should =~ %r{^application/xhtml\+xml}
+    Storage.last_key.should == '/index'
     Storage.last_value.should be_nil
 
     Storage.reset
@@ -58,14 +65,21 @@ describe 'ikiw' do
     Storage.reset
     put '/', :title => 'TITLE', :content => 'CONTENT'
     last_response.status.should == 201
-    Storage.last_key.should == '/'
+    Storage.last_key.should == '/index'
+    Storage.last_value.title.should == 'TITLE'
+    Storage.last_value.content.should == 'CONTENT'
+
+    Storage.reset
+    put '/index', :title => 'TITLE', :content => 'CONTENT'
+    last_response.status.should == 201
+    Storage.last_key.should == '/index'
     Storage.last_value.title.should == 'TITLE'
     Storage.last_value.content.should == 'CONTENT'
 
     Storage.reset
     put '/'
     last_response.status.should == 201
-    Storage.last_key.should == '/'
+    Storage.last_key.should == '/index'
     Storage.last_value.should be_nil # erase
 
     Storage.reset
@@ -118,7 +132,13 @@ describe 'ikiw' do
     Storage.reset
     get '/foo/'
     last_response.should be_ok
-    Storage.last_key.should == '/foo'
+    Storage.last_key.should == '/foo/index'
+    Storage.last_value.should be_nil
+
+    Storage.reset
+    get '/foo/index'
+    last_response.should be_ok
+    Storage.last_key.should == '/foo/index'
     Storage.last_value.should be_nil
 
     Storage.reset
@@ -145,7 +165,14 @@ describe 'ikiw' do
     Storage.reset
     put '/foo/', :title => 'TITLE', :content => 'CONTENT'
     last_response.status.should == 201
-    Storage.last_key.should == '/foo'
+    Storage.last_key.should == '/foo/index'
+    Storage.last_value.title.should == 'TITLE'
+    Storage.last_value.content.should == 'CONTENT'
+
+    Storage.reset
+    put '/foo/index', :title => 'TITLE', :content => 'CONTENT'
+    last_response.status.should == 201
+    Storage.last_key.should == '/foo/index'
     Storage.last_value.title.should == 'TITLE'
     Storage.last_value.content.should == 'CONTENT'
 
