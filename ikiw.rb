@@ -10,7 +10,6 @@ module Storage
 
   def self.get_path(key)
     filename = [key].pack('m').tr('+/', '-_').gsub("\n", '')
-    p filename
     File.dirname(__FILE__) + '/data/' + filename
   end
 
@@ -99,7 +98,7 @@ get /^([^.]+)(\.([^.\/]+?))?$/ do
   return 404 unless mime_type
   key = path.sub(/\/$/, '/index')
   data = storage[key] || {}
-  page = Page.new(data["title"] || '', data["content"] || '')
+  page = Page.new(data["title"] || key, data["content"] || '')
 
   content_type mime_type, :charset => 'utf-8'
   case type
@@ -118,6 +117,10 @@ put /^([^.]+)(\.([^.\/]+?))?$/ do
   path = params[:captures][0]
   ext = params[:captures][2]
   return 405 if ext and ext == 'html'
+  data = {
+    :title   => params[:title],
+    :content => params[:content],
+  }
   case request.content_type
   when 'application/x-www-form-urlencoded'
     return 400 if ext
@@ -125,12 +128,15 @@ put /^([^.]+)(\.([^.\/]+?))?$/ do
     return 400 if ext and ext != 'json'
     json_data = JSON.parse(request.body.string)
     return 422 unless json_data.kind_of?(Hash)
-    params.merge!(json_data);
+    data = {}
+    json_data.each do |key, value|
+      data[key.intern] = value
+    end
   end
   key = path.sub(/\/$/, '/index')
-  return 422 if !params[:title] ^ !params[:content]
-  if params[:title] and params[:content]
-    storage[key] = Page.new(params[:title], params[:content])
+  return 422 if !data[:title] ^ !data[:content]
+  if data[:title] and data[:content]
+    storage[key] = Page.new(data[:title], data[:content])
   else
     storage[key] = nil
   end

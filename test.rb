@@ -45,6 +45,7 @@ describe 'ikiw' do
     get '/'
     last_response.should be_ok
     last_response.content_type.should =~ %r{^application/xhtml\+xml}
+    last_response.body.should_not be_empty
     Storage.last_key.should == '/index'
     Storage.last_value.should be_nil
 
@@ -52,6 +53,7 @@ describe 'ikiw' do
     get '/index.html'
     last_response.should be_ok
     last_response.content_type.should =~ %r{^application/xhtml\+xml}
+    last_response.body.should_not be_empty
     Storage.last_key.should == '/index'
     Storage.last_value.should be_nil
 
@@ -101,6 +103,7 @@ describe 'ikiw' do
     get '/foo'
     last_response.should be_ok
     last_response.content_type.should =~ %r{^application/xhtml\+xml}
+    last_response.body.should_not be_empty
     Storage.last_key.should == '/foo'
     Storage.last_value.should be_nil
 
@@ -108,6 +111,7 @@ describe 'ikiw' do
     get '/foo.html'
     last_response.should be_ok
     last_response.content_type.should =~ %r{^application/xhtml\+xml}
+    last_response.body.should_not be_empty
     Storage.last_key.should == '/foo'
     Storage.last_value.should be_nil
 
@@ -115,6 +119,7 @@ describe 'ikiw' do
     get '/foo.json'
     last_response.should be_ok
     last_response.content_type.should =~ %r{^application/json}
+    last_response.body.should_not be_empty
     Storage.last_key.should == '/foo'
     Storage.last_value.should be_nil
 
@@ -189,6 +194,7 @@ describe 'ikiw' do
     get '/foo/bar/baz'
     last_response.should be_ok
     last_response.content_type.should =~ %r{^application/xhtml\+xml}
+    last_response.body.should_not be_empty
     Storage.last_key.should == '/foo/bar/baz'
     Storage.last_value.should be_nil
 
@@ -196,6 +202,7 @@ describe 'ikiw' do
     get '/foo/bar/baz.html'
     last_response.should be_ok
     last_response.content_type.should =~ %r{^application/xhtml\+xml}
+    last_response.body.should_not be_empty
     Storage.last_key.should == '/foo/bar/baz'
     Storage.last_value.should be_nil
 
@@ -203,6 +210,7 @@ describe 'ikiw' do
     get '/foo/bar/baz.json'
     last_response.should be_ok
     last_response.content_type.should =~ %r{^application/json}
+    last_response.body.should_not be_empty
     Storage.last_key.should == '/foo/bar/baz'
     Storage.last_value.should be_nil
 
@@ -239,7 +247,7 @@ describe 'ikiw' do
     header 'Accept', 'application/json'
     get '/foo/bar/baz'
     last_response.status.should == 200
-    last_response.content_type.should =~ /^application\/json/
+    last_response.content_type.should =~ %r{^application/json}
     body = last_response.body
     JSON.parse(body).should == {
       'title' => 'title of /foo/bar/baz',
@@ -249,10 +257,10 @@ describe 'ikiw' do
     Storage.last_value.should be_nil
 
     Storage.reset
-    header 'Accept', ''
+    header 'Accept', 'application/xhtml+xml'
     get '/foo/bar/baz.json'
     last_response.status.should == 200
-    last_response.content_type.should =~ /^application\/json/
+    last_response.content_type.should =~ %r{^application/json}
     body = last_response.body
     JSON.parse(body).should == {
       'title' => 'title of /foo/bar/baz',
