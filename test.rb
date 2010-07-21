@@ -1,3 +1,4 @@
+# -*- coding: undecided -*-
 require 'ikiw'
 require 'spec'
 require 'rack/test'
@@ -16,7 +17,7 @@ module Storage
 
   def self.[](key)
     @last_key = key
-    {'title' => key, 'content' => key}
+    {'title' => "title of #{key}", 'content' => "content of #{key}"}
   end
 
   def self.[]=(key, value)
@@ -229,6 +230,74 @@ describe 'ikiw' do
     Storage.reset
     put '/foo/bar.html/baz', :title => 'TITLE', :content => 'CONTENT'
     last_response.status.should == 404
+    Storage.last_key.should be_nil
+    Storage.last_value.should be_nil
+  end
+
+  it 'gets json' do
+    Storage.reset
+    header 'Accept', 'application/json'
+    get '/foo/bar/baz'
+    last_response.status.should == 200
+    last_response.content_type.should =~ /^application\/json/
+    body = last_response.body
+    JSON.parse(body).should == {
+      'title' => 'title of /foo/bar/baz',
+      'content' => 'content of /foo/bar/baz',
+    }
+    Storage.last_key.should == '/foo/bar/baz'
+    Storage.last_value.should be_nil
+
+    Storage.reset
+    header 'Accept', ''
+    get '/foo/bar/baz.json'
+    last_response.status.should == 200
+    last_response.content_type.should =~ /^application\/json/
+    body = last_response.body
+    JSON.parse(body).should == {
+      'title' => 'title of /foo/bar/baz',
+      'content' => 'content of /foo/bar/baz',
+    }
+    Storage.last_key.should == '/foo/bar/baz'
+    Storage.last_value.should be_nil
+  end
+
+  it 'puts json' do
+    Storage.reset
+    data = '{"title": "TITLE", "content": "CONTENT"}'
+    header 'Content-Type', 'application/json'
+    header 'Content-Length', data.length
+    put '/foo/bar/baz', {}, :input => data
+    last_response.status.should == 201
+    Storage.last_key.should == '/foo/bar/baz'
+    Storage.last_value.title.should == 'TITLE'
+    Storage.last_value.content.should == 'CONTENT'
+
+    Storage.reset
+    data = '{"title": "TITLE", "content": "CONTENT"}'
+    header 'Content-Type', 'application/x-www-form-urlencoded'
+    header 'Content-Length', data.length
+    put '/foo/bar/baz', {}, :input => data
+    last_response.status.should == 201
+    Storage.last_key.should == '/foo/bar/baz'
+    Storage.last_value.should be_nil # data isn't be read
+
+    Storage.reset
+    data = '{"title": "TITLE", "content": "CONTENT"}'
+    header 'Content-Type', 'application/json'
+    header 'Content-Length', data.length
+    put '/foo/bar/baz.json', {}, :input => data
+    last_response.status.should == 201
+    Storage.last_key.should == '/foo/bar/baz'
+    Storage.last_value.title.should == 'TITLE'
+    Storage.last_value.content.should == 'CONTENT'
+
+    Storage.reset
+    data = '{"title": "TITLE", "content": "CONTENT"}'
+    header 'Content-Type', 'application/x-www-form-urlencoded'
+    header 'Content-Length', data.length
+    put '/foo/bar/baz.json', {}, :input => data
+    last_response.status.should == 400
     Storage.last_key.should be_nil
     Storage.last_value.should be_nil
   end
