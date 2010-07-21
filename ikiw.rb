@@ -64,6 +64,10 @@ get '/stylesheets/style.css' do
   sass :style
 end
 
+get /\/\./ do
+  404
+end
+
 get /^([^.]+)(\.([^.\/]+?))?$/ do
   path = params[:captures][0]
   ext = params[:captures][2] || 'html'
@@ -72,7 +76,6 @@ get /^([^.]+)(\.([^.\/]+?))?$/ do
     'json' => 'application/json',
   }[ext]
   return 404 unless mime_type
-  return 404 if (path[-1].chr == '/' and params[:captures][2])
   key = path.sub(/\/$/, '/index')
   data = storage[key] || {}
   page = Page.new(data["title"] || '', data["content"] || '')
@@ -86,9 +89,12 @@ get /^([^.]+)(\.([^.\/]+?))?$/ do
   end
 end
 
-put /^([^.]+)(\.([^.\/]+?))?$/ do
+put /[^.\/]\.[^.\/]+?$/ do
+  405
+end
+
+put /^([^.]+)$/ do
   path = params[:captures][0]
-  return path[-1].chr == '/' ? 404 : 405 if params[:captures][2]
   key = path.sub(/\/$/, '/index')
   return 422 if !params[:title] ^ !params[:content]
   if params[:title] and params[:content]
