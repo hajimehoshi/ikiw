@@ -20,16 +20,13 @@
     #edit
       %section
         %form{:action => '.', :method => 'put'}
-          %dl
-            %dt Title
-            %dd
-              %input{:id => 'inputTitle', :name => 'title', :type => 'text', :value => page.title}
-            %dt Content
-            %dd
-              %textarea{:id => 'inputContent', :name => 'content'}&= page.content
-          %p
-            %input{:type => 'submit'}
+        %h2
+          %input{:id => 'inputTitle', :name => 'title', :type => 'text', :value => page.title}
+        %div{:id => 'editorMain'}
+        %p
+          %input{:type => 'submit'}
     %address
       Hajime Hoshi
+    %span{:id => 'test', :contenteditable => 'true'} hogehoge
     %script{:src => 'javascripts/jquery-1.4.2.min.js', :type => 'text/javascript', :charset => 'utf-8'}
     %script{:src => 'javascripts/ikiw.js', :type => 'text/javascript', :charset => 'utf-8'}

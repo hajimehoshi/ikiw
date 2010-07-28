@@ -1,3 +1,5 @@
+var hoge;
+
 $(function () {
     $('#edit').hide();
     $('#viewTab').click(function (e) {
@@ -25,4 +27,24 @@ $(function () {
 	e.preventDefault();
 	return false;
     });
+    $('#editorMain').keydown(function (e) {
+	if (e.keyCode == 86 && e.ctrlKey) {
+	    alert('no!');
+	    e.preventDefault();
+	    return false;
+	}
+    });
+    document.getElementById("test").onpaste = function (e) {
+	hoge = e;
+	if (e.clipboardData) {
+	    console.log(e.clipboardData.getData('text/plain'));
+	} else {
+	    
+	}
+	return false;
+    }
+    /*$('#test').bind('paste', function(e) {
+	
+	return false;
+    });*/
 });
