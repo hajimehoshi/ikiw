@@ -34,7 +34,7 @@ $(function () {
 	    return false;
 	}
     });
-    document.getElementById("test").onpaste = function (e) {
+    /*document.getElementById("test").onpaste = function (e) {
 	hoge = e;
 	if (e.clipboardData) {
 	    console.log(e.clipboardData.getData('text/plain'));
@@ -42,9 +42,13 @@ $(function () {
 	    
 	}
 	return false;
-    }
-    /*$('#test').bind('paste', function(e) {
-	
-	return false;
-    });*/
+    }*/
+    $.ajax({
+	url: this.action,
+	type: "get",
+	dataType: "json",
+	success: function (data) {
+	    console.info(data);
+	}
+    });
 });

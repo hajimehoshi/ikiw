@@ -15,16 +15,17 @@
     #view
       %section
         %h2&= page.title
-        %section
-          != page.content
+        != page.content
     #edit
       %section
+        -# TODO: remove ext
         %form{:action => '.', :method => 'put'}
-        %h2
-          %input{:id => 'inputTitle', :name => 'title', :type => 'text', :value => page.title}
-        %div{:id => 'editorMain'}
-        %p
-          %input{:type => 'submit'}
+          %h2
+            %input{:id => 'inputTitle', :name => 'title', :type => 'text', :value => page.title}
+          %div{:id => 'editorMain'}
+          %textarea{:name => 'content'}!= page.content
+          %p
+            %input{:type => 'submit'}
     %address
       Hajime Hoshi
     %span{:id => 'test', :contenteditable => 'true'} hogehoge

@@ -52,7 +52,7 @@ class Page
   def to_json
     {
       :title   => title,
-      :content => content,
+      :content => JSON.parse(content),
     }.to_json
   end
 
